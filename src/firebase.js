@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
+import { browserLocalPersistence, createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, onAuthStateChanged, setPersistence, signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
 import { doc, getFirestore, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -15,6 +15,8 @@ const app = isFirebaseConfigured ? initializeApp(firebaseConfig) : null;
 export const auth = app ? getAuth(app) : null;
 const db = app ? getFirestore(app) : null;
 
+// Keep the session after closing the browser or the installed iPhone app.
+export const enablePersistentSession = () => setPersistence(auth, browserLocalPersistence);
 export const observeAuth = (callback) => onAuthStateChanged(auth, callback);
 export const createAccount = (email, password) => createUserWithEmailAndPassword(auth, email, password);
 export const signIn = (email, password) => signInWithEmailAndPassword(auth, email, password);

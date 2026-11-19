@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { CalendarDays, Check, ChevronLeft, ChevronRight, Circle, Clock3, CopyPlus, LayoutList, LogOut, Plus, Trash2, X } from 'lucide-react';
-import { createAccount, isFirebaseConfigured, observeAuth, observePlanner, savePlanner, signIn, signInWithGoogle, signOutUser } from './firebase';
+import { createAccount, enablePersistentSession, isFirebaseConfigured, observeAuth, observePlanner, savePlanner, signIn, signInWithGoogle, signOutUser } from './firebase';
 import './styles.css';
 
 const STORAGE_KEY = 'dayflow-data-v1';
@@ -68,7 +68,13 @@ function App() {
   useEffect(() => { if (!notice) return; const t = setTimeout(() => setNotice(''), 2600); return () => clearTimeout(t); }, [notice]);
   useEffect(() => {
     if (!isFirebaseConfigured) return undefined;
-    return observeAuth((nextUser) => { setUser(nextUser); setRemoteLoaded(!nextUser); });
+    let unsubscribe;
+    enablePersistentSession()
+      .catch(() => setNotice('Przeglądarka nie pozwoliła zapamiętać logowania'))
+      .finally(() => {
+        unsubscribe = observeAuth((nextUser) => { setUser(nextUser); setRemoteLoaded(!nextUser); });
+      });
+    return () => unsubscribe?.();
   }, []);
   useEffect(() => {
     if (!isFirebaseConfigured || !user) return undefined;
