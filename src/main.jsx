@@ -110,7 +110,7 @@ function App() {
     setTemplateName(''); setTemplateLines([emptyTemplateTask()]); setNotice('Szablon został zapisany');
   };
   const applyTemplate = (template) => {
-    setData((d) => ({ ...d, tasks: { ...d.tasks, [selectedDate]: [...(d.tasks[selectedDate] || []), ...template.tasks.map((task) => ({ id: uid(), ...normalizeTemplateTask(task), done: false }))] } }));
+    setData((d) => ({ ...d, tasks: { ...d.tasks, [activeDate]: [...(d.tasks[activeDate] || []), ...template.tasks.map((task) => ({ id: uid(), ...normalizeTemplateTask(task), done: false }))] } }));
     setApplyOpen(false); setNotice(`Dodano szablon „${template.name}”`);
   };
 
@@ -164,7 +164,7 @@ function App() {
       {view === 'templates' && <TemplatesView templates={data.templates} templateName={templateName} setTemplateName={setTemplateName} lines={templateLines} setLines={setTemplateLines} saveTemplate={saveTemplate} remove={(id) => setData((d) => ({ ...d, templates: d.templates.filter((t) => t.id !== id) }))} />}
     </main>
 
-    {applyOpen && <TemplateDialog templates={data.templates} date={selectedDate} close={() => setApplyOpen(false)} apply={applyTemplate} />}
+    {applyOpen && <TemplateDialog templates={data.templates} date={activeDate} close={() => setApplyOpen(false)} apply={applyTemplate} />}
     {notice && <div className="toast" role="status"><Check size={17}/>{notice}</div>}
   </div>;
 }
@@ -183,7 +183,7 @@ function TaskView({ date, tasks, completed, newTask, setNewTask, startTime, setS
   return <section className="page task-page">
     <div className="page-heading">
       <div>{onBack && <button className="back" onClick={onBack}><ChevronLeft size={18}/> Kalendarz</button>}<p className="eyebrow">{isToday ? 'Twój plan' : 'Zaplanowany dzień'}</p><h1>{isToday ? 'Dzisiaj' : dateLabel(date)}</h1><p className="date-copy">{dateLabel(date, true)}</p></div>
-      {!isToday && <button className="secondary" onClick={onApply}><CopyPlus size={17}/> Zastosuj szablon</button>}
+      <button className="secondary" onClick={onApply}><CopyPlus size={17}/> Zastosuj szablon</button>
     </div>
     <div className="progress-card"><div><strong>{completed} z {tasks.length}</strong><span>zadań ukończonych</span></div><div className="progress-track"><i style={{ width: `${percent}%` }}/></div><b>{percent}%</b></div>
     <form className="add-task" onSubmit={addTask}>
